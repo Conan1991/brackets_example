@@ -1,5 +1,6 @@
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -11,41 +12,50 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         String lineNew = scanner.nextLine();
         char[] chars = lineNew.toCharArray();
+        long startTime = System.nanoTime();
 
-        LinkedList<ValidBracket> result = new LinkedList<>();
-        int counter = 0;
+
+        List<Character> result = new ArrayList<>();
+        LinkedList<Integer> openBracketPositions = new LinkedList<>();
+        int openBracketCounter = 0;
+        int positionCounter = 0;
         for (char character : chars) {
             if (openBracket.equals(character)) {
-                result.addLast(new ValidBracket(openBracket, false));
-                counter++;
-            } else if (closeBracket.equals(character) && !result.isEmpty() && counter > 0) {
-                result.addLast(new ValidBracket(closeBracket, true));
-                setFirstOpenBracketIsValid(result);
-                counter--;
+                result.add(character);
+                openBracketCounter++;
+                openBracketPositions.add(positionCounter);
+                positionCounter++;
+            } else if (closeBracket.equals(character) && !result.isEmpty() && openBracketCounter > 0) {
+                result.add(character);
+                openBracketCounter--;
+                positionCounter++;
+                if (!openBracketPositions.isEmpty()) {
+                    openBracketPositions.removeLast();
+                }
             }
         }
+        removeNonValidOpenBrackets(result, openBracketPositions, openBracketCounter);
 
-        long count = result.stream().filter(ValidBracket::getValid).count();
+        long count = result.size();
         if (count > 0) {
             System.out.print(count + " - ");
-            result.stream()
-                    .filter(ValidBracket::getValid)
-                    .map(ValidBracket::getBracket)
-                    .forEach(System.out::print);
+            result.forEach(System.out::print);
         } else {
             System.out.println(count);
         }
+
+        long endTime = System.nanoTime();
+        long totalTime = endTime - startTime;
+        System.out.println();
+        System.out.print(totalTime / 1000000);
     }
 
-    private static void setFirstOpenBracketIsValid(LinkedList<ValidBracket> linkedList) {
-        Iterator<ValidBracket> validBracketIterator = linkedList.descendingIterator();
-        while (validBracketIterator.hasNext()) {
-            ValidBracket next = validBracketIterator.next();
-            if (!next.getValid()) {
-                next.setValid(true);
-                return;
+    private static void removeNonValidOpenBrackets(List<Character> linkedList, LinkedList<Integer> positions, int openBracketsCounter) {
+        while (openBracketsCounter > 0) {
+            if (!positions.isEmpty()) {
+                linkedList.remove(positions.getFirst().intValue());
             }
+            openBracketsCounter--;
         }
     }
-
 }
