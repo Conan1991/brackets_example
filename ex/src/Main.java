@@ -1,7 +1,7 @@
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Stack;
 
 public class Main {
     static Character openBracket = '(';
@@ -16,21 +16,21 @@ public class Main {
 
 
         List<Character> result = new ArrayList<>();
-        LinkedList<Integer> openBracketPositions = new LinkedList<>();
+        Stack<Integer> openBracketPositions = new Stack<>();
         int openBracketCounter = 0;
         int positionCounter = 0;
         for (char character : chars) {
             if (openBracket.equals(character)) {
                 result.add(character);
                 openBracketCounter++;
-                openBracketPositions.add(positionCounter);
+                openBracketPositions.push(positionCounter);
                 positionCounter++;
             } else if (closeBracket.equals(character) && !result.isEmpty() && openBracketCounter > 0) {
                 result.add(character);
                 openBracketCounter--;
                 positionCounter++;
                 if (!openBracketPositions.isEmpty()) {
-                    openBracketPositions.removeLast();
+                    openBracketPositions.pop();
                 }
             }
         }
@@ -50,10 +50,10 @@ public class Main {
         System.out.print(totalTime / 1000000);
     }
 
-    private static void removeNonValidOpenBrackets(List<Character> linkedList, LinkedList<Integer> positions, int openBracketsCounter) {
+    private static void removeNonValidOpenBrackets(List<Character> list, Stack<Integer> positions, int openBracketsCounter) {
         while (openBracketsCounter > 0) {
             if (!positions.isEmpty()) {
-                linkedList.remove(positions.getFirst().intValue());
+                list.remove(positions.pop().intValue());
             }
             openBracketsCounter--;
         }
